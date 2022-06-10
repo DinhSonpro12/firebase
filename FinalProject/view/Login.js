@@ -1,50 +1,22 @@
 // Login.js
 import React, {Component, useState} from 'react'
 import { NavigationContainer } from '@react-navigation/native';
-import { StyleSheet, Text, TextInput, View, Button, Image, SafeAreaView, Alert,TouchableOpacity,StatusBar, Dimensions} from 'react-native'
-// import analytics from '../firebase'
+import { StyleSheet, Text, TextInput, View, Button, Image,
+     SafeAreaView, Alert,TouchableOpacity,StatusBar, Dimensions} from 'react-native'
 import '../firebase'
-
-
-// import { getDatabase, ref, onValue, set } from 'firebase/database';
-// import { initializeApp } from 'firebase/app';
-// import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-// const firebaseConfig = {
-//   apiKey: "AIzaSyDj3B2jCPUcHm5XEih8YK87qr0wHaORtuw",
-//   authDomain: "reactnativefire-f0377.firebaseapp.com",
-//   databaseURL: "https://reactnativefire-f0377-default-rtdb.asia-southeast1.firebasedatabase.app",
-//   projectId: "reactnativefire-f0377",
-//   storageBucket: "reactnativefire-f0377.appspot.com",
-//   messagingSenderId: "305324322492",
-//   appId: "1:305324322492:web:90d727be709aea2620aab9",
-//   measurementId: "G-FZLC7R5P8S"
-// };
-
-// // Initialize Firebaserr
-// const app = initializeApp(firebaseConfig);
-// const analytics = getAnalytics(app);
-
-// let app;
-// if (firebase.apps.length === 0) {
-//   app = firebase.initializeApp(firebaseConfig);
-// } else {
-//   app = firebase.app()
-// }
-
-
-// let app;
 import {
+    ToastAndroid,
+    Platform,
+    AlertIOS,
+  } from 'react-native';
+
+  import {
     getAuth,
     onAuthStateChanged,
-    FacebookAuthProvider,
     EmailAuthProvider,
     signInWithCredential,
-    createUserWithEmailAndPassword
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword
   } from 'firebase/auth';
 
 
@@ -55,18 +27,47 @@ export default Login =({navigation}) =>{
 
     const auth = getAuth();
 
+    function notifyMessage(msg) {
+        if (Platform.OS === 'android') {
+          ToastAndroid.show(msg, ToastAndroid.SHORT)
+        } else {
+          AlertIOS.alert(msg);
+        }
+      }
+
     const handleSignUp = () => {
-        
         createUserWithEmailAndPassword(auth,email,password)
         .then((userCredential) => {
             const user = userCredential.user;
             console.log('Registered with:', user.email);
+            // Alert.alert("lee","successful")
+            notifyMessage("successful")
         })
         .catch((error) => {
             const errorCode = error.code;
             const errorMessage = error.message;
         });
 
+      }
+
+      const handleLogin = () => {
+        signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Signed in 
+          const user = userCredential.user;
+          notifyMessage("successful_Login")
+          navigation.replace("Home")
+
+          // ...
+        })
+        // .catch((error) => {
+        // //   const errorCode = error.code;
+        // //   const errorMessage = error.message;
+        // //   notifyMessage("fail_login")
+        // // Alert.alert("none","fail_login")
+ 
+        // });
+        .catch(error => alert(error.message))
       }
 
     const [getPasswordVisible, setPasswordVisible] = useState(false)
@@ -126,18 +127,21 @@ export default Login =({navigation}) =>{
             
                 {/*Login and Signin*/}
                 <View style ={{width:'100%', height: '20%', marginTop: 0.2*windownHeight, alignItems: 'center'}}>
+
                     {/* Login*/}
                     <View style ={{height: 40, width: windownWidth*0.6, marginTop: 10}}>
-                        <Button title='Login'></Button>
+                        <Button title='Login'
+                            onPress={handleLogin}>
+                        </Button>
                     </View>
+
                     {/* Password*/}
                     <View style ={{height: 40, width: windownWidth*0.6, marginTop: 10}}>
-                        {/* <Button title='Sign in'></Button>                     */}
-                        <TouchableOpacity
-                            onPress={handleSignUp} >
-                            <Text>Register</Text>
-                        </TouchableOpacity>
+                        <Button title='Sign in'
+                            onPress={handleSignUp}>
+                        </Button>                    
                     </View>
+
                 </View>
             </View>
         </SafeAreaView>
