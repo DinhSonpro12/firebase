@@ -23,10 +23,25 @@ import {
 const windownWidth = Dimensions.get('window').width;
 const windownHeight= Dimensions.get('window').height;
 
+
 export default Login =({navigation}) =>{
 
     const auth = getAuth();
 
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged(user => {
+          if (user) {
+            navigation.replace("Home")
+          }
+          else{
+            notifyMessage("Login Fail")
+          }
+        })
+    
+        return unsubscribe
+      }, [])
+
+    // func_toast message
     function notifyMessage(msg) {
         if (Platform.OS === 'android') {
           ToastAndroid.show(msg, ToastAndroid.SHORT)
@@ -35,6 +50,7 @@ export default Login =({navigation}) =>{
         }
       }
 
+    // func_HandleSigup
     const handleSignUp = () => {
         createUserWithEmailAndPassword(auth,email,password)
         .then((userCredential) => {
@@ -47,28 +63,29 @@ export default Login =({navigation}) =>{
             const errorCode = error.code;
             const errorMessage = error.message;
         });
-
       }
 
-      const handleLogin = () => {
+    // func_handle_Login
+    const handleLogin = () => {
         signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          const user = userCredential.user;
-          notifyMessage("successful_Login")
-          navigation.replace("Home")
+            const user = userCredential.user;
+            notifyMessage("successful_Login")
+            // navigation.replace("Home")
 
         })
         .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
- 
+            const errorCode = error.code;
+            const errorMessage = error.message;
+
         });
-      }
-// tt
-//asdasdasd
+    }
+
+
     const [getPasswordVisible, setPasswordVisible] = useState(false)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+
     return (
         <View style ={{height: '100%', width: '100%', backgroundColor: '#EDE3AF'}}> 
             <StatusBar barStyle = 'dark-content'/>
@@ -94,8 +111,6 @@ export default Login =({navigation}) =>{
                             value={email}
                             onChangeText={text => setEmail(text)}
                             >
-
-
                         </TextInput>
                     </View>
 
@@ -121,7 +136,7 @@ export default Login =({navigation}) =>{
 
                 </View>
             
-                {/*Login and Signin*/}
+                {/*Login and Signup*/}
                 <View style ={{width:'100%', height: '20%', marginTop: 0.2*windownHeight, alignItems: 'center'}}>
 
                     {/* Login*/}
@@ -131,7 +146,7 @@ export default Login =({navigation}) =>{
                         </Button>
                     </View>
 
-                    {/* Password*/}
+                    {/* SignUp*/}
                     <View style ={{height: 40, width: windownWidth*0.6, marginTop: 10}}>
                         <Button title='Sign in'
                             onPress={handleSignUp}>
