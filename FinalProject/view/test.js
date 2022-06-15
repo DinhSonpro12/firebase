@@ -20,47 +20,15 @@ import {
     signOut
   } from 'firebase/auth';
 
-  import firebase from 'firebase/app';
-
   import { getDatabase,
     ref,
     set,
     update,
     remove 
     } from "firebase/database";
-import App from '../App';
-
-
-/////////////////
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyDj3B2jCPUcHm5XEih8YK87qr0wHaORtuw",
-  authDomain: "reactnativefire-f0377.firebaseapp.com",
-  databaseURL: "https://reactnativefire-f0377-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "reactnativefire-f0377",
-  storageBucket: "reactnativefire-f0377.appspot.com",
-  messagingSenderId: "305324322492",
-  appId: "1:305324322492:web:90d727be709aea2620aab9",
-  measurementId: "G-FZLC7R5P8S"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
-//////////////////////
 
 
 
-
-
-// import database from '@react-native-firebase/database';
 
 
 const windownWidth = Dimensions.get('window').width;
@@ -71,30 +39,39 @@ export default Login =({navigation}) =>{
 
     const auth = getAuth();
 
+    const db = getDatabase();
 
-    const db = getDatabase(app)
-    // const p = firebase.auth().getDatabase()
+    createDB =(emai,name,pass,uid) =>{
 
-
-        // func handel update data of user to realtime_db --Regis
-        function PushData_user(name) {
-            // uid = auth.currentUser.uid
-            // email = auth.currentUser.email
-            
-
-            set(ref(db,'user/'), 
+            set(ref(db,'nguoidung/'+uid), 
             {
-                email: 'email',
-                ten: 'name',
-                pass: 'password',
+                email: email,
+                ten: name,
+                pass: pass,
+
             })
-        }
+    };
+
+    // func handel update data of user to realtime_db --Regis
+    function PushData_user(name) {
+        uid = auth.currentUser.uid
+        email = auth.currentUser.email
+        set(ref(db,'user/'+uid), 
+        {
+            email: email,
+            ten: name,
+            pass: pass,
+
+        })
+    }
+
+        
+
     
 
-
+    // signout 
     signOut(auth).then(() => {
         // Sign-out successful.
-        
 
         }).catch((error) => {
         
@@ -132,9 +109,9 @@ export default Login =({navigation}) =>{
         .then((userCredential) => {
             const user = userCredential.user;
             console.log('Registered with:', user.email);
+            PushData_user("son")
             // Alert.alert("lee","successful")
             notifyMessage("successful")
-            PushData_user("son")
         })
         .catch((error) => {
             const errorCode = error.code;
@@ -219,7 +196,7 @@ export default Login =({navigation}) =>{
                     {/* Login*/}
                     <View style ={{height: 40, width: windownWidth*0.6, marginTop: 10}}>
                         <Button title='Login'
-                            onPress={PushData_user("son")}>
+                            onPress={handleLogin}>
                         </Button>
                     </View>
 
@@ -227,6 +204,8 @@ export default Login =({navigation}) =>{
                     <View style ={{height: 40, width: windownWidth*0.6, marginTop: 10}}>
                         <Button title='Sign in'
                             onPress={handleSignUp}>
+                                
+
                         </Button>                    
                     </View>
 
